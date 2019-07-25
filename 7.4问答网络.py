@@ -147,3 +147,29 @@ print(Xstrain.shape, Xqtrain.shape, Ytrain.shape, Xstest.shape, Xqtest.shape, Yt
 model有两个输入：问题词ID序列，故事词序列
 嵌入层将词ID换成64维度向量，将其转换成大小为max_question_length向量，
 '''
+
+# define network
+EMBEDDING_SIZE = 64
+LATENT_SIZE = 32
+BATCH_SIZE = 64
+NUM_EPOCHS = 10
+
+# inputs
+story_input = Input(shape=(story_maxlen,))
+question_input = Input(shape=(question_maxlen,))
+
+# story encoder memory
+story_encoder = Embedding(input_dim=vocab_size,
+                         output_dim=EMBEDDING_SIZE,
+                         input_length=story_maxlen)(story_input)
+story_encoder = Dropout(0.3)(story_encoder)
+
+# ######################question encoder
+question_encoder = Embedding(input_dim=vocab_size,
+                            output_dim=EMBEDDING_SIZE,
+                            input_length=question_maxlen)(question_input)
+question_encoder = Dropout(0.3)(question_encoder)
+
+
+# 使用dot（），函数 match between story and question
+match = dot([story_encoder, question_encoder], axes=[2, 2])
